@@ -1,12 +1,14 @@
 "use client";
 
-import { motion } from "motion/react";
-import React, { useState, useRef, useEffect } from "react";
-import { Contact } from "./Contact";
-import Skills from "./Skills";
-import { Minus, Square, SquareTerminal, X } from "lucide-react";
-import { Timeline } from "./timeline";
 import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useRef, useEffect } from "react";
+import { Minus, Square, SquareTerminal, X, ArrowLeft, Compass } from "lucide-react";
+import { Button } from "../ui/button";
+import Skills from "./skills";
+import { Whoami } from "./whoami";
+import { Timeline } from "./timeline";
+import GitHubActivity from "./github";
 
 // ==================== Types ====================
 interface TerminalLine {
@@ -26,6 +28,7 @@ const COMMANDS: Command[] = [
   { cmd: "whoami", desc: "Show about developer", isImportant: true },
   { cmd: "skill", desc: "Show skills", isImportant: true },
   { cmd: "project", desc: "Show projects", isImportant: true },
+  { cmd: "git", desc: "Show git", isImportant: true },
   { cmd: "ls", desc: "List directory contents" },
   { cmd: "date", desc: "Display current date and time" },
   { cmd: "clear", desc: "Clear the screen" },
@@ -37,7 +40,7 @@ const INITIAL_HISTORY: TerminalLine[] = [
   { type: "output", content: "" },
 ];
 
-// ==================== Data ====================
+// ==================== Data for TimeLine Compo  ====================
 const PROJECT_DATA = [
   {
     title: "Discover Myanmar",
@@ -185,9 +188,8 @@ const CommandHelp: React.FC = () => (
         <React.Fragment key={cmd}>
           <span className="font-semibold text-yellow-300">{cmd}</span>
           <span
-            className={`col-span-2 ${
-              isImportant ? "text-[#8ae234]" : "text-[#d3d7cf]"
-            }`}>
+            className={`col-span-2 ${isImportant ? "text-[#8ae234]" : "text-[#d3d7cf]"
+              }`}>
             {desc}
           </span>
         </React.Fragment>
@@ -219,29 +221,55 @@ const DateOutput: React.FC = () => {
   );
 };
 
-const TitleBar: React.FC = () => (
+const TitleBar: React.FC<{ title?: string }> = ({
+  title = "banyar@ubuntu",
+}) => (
   <div className="bg-[#2D2D2D] h-10 flex items-center justify-between px-3 select-none border-b border-black/50">
-    <div className="flex items-center justify-center w-8 h-8 rounded hover:bg-white/10 cursor-pointer transition-colors">
+    <Button className="w-8 h-8 flex items-center justify-center rounded hover:bg-white/10 transition-colors group">
       <SquareTerminal />
-    </div>
+    </Button>
 
     <div className="font-bold text-[#E6E6E6] text-sm tracking-wide flex-1 text-center">
-      banyar@ubuntu
+      {title}
     </div>
 
-    <div className="flex items-center gap-1">
-      <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-white/10 transition-colors group">
+    <div className="flex items-center gap-1 text-white">
+      <Button className="w-8 h-8 flex items-center justify-center rounded hover:bg-white/10 transition-colors group">
         <Minus />
-      </button>
-      <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-white/10 transition-colors group">
+      </Button>
+      <Button className="w-8 h-8 flex items-center justify-center rounded hover:bg-white/10 transition-colors group">
         <Square />
-      </button>
-      <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-[#E95420] transition-colors group">
+      </Button>
+      <Button className="w-8 h-8 flex items-center justify-center rounded hover:bg-[#E95420] transition-colors group">
         <X />
-      </button>
+      </Button>
     </div>
   </div>
 );
+
+// ==================== Projects View Component ====================
+const ProjectsView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      className="mx-auto my-8 rounded-sm overflow-hidden font-mono text-sm  w-full max-w-4xl">
+      <div className="text-white p-2 scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar scrollbar-thumb-white scrollbar-track-slate-300">
+        <Timeline data={PROJECT_DATA} />
+        <div className="mb-6">
+          <Button onClick={onBack}>
+            <div className="flex items-center gap-2">
+              <ArrowLeft size={16} />
+              Back to Terminal
+            </div>
+          </Button>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
 
 // ==================== Hooks ====================
 const useAutoScroll = (dependency: any[]) => {
@@ -264,20 +292,25 @@ const useAutoScroll = (dependency: any[]) => {
 };
 
 // ==================== Command Handler ====================
-const getCommandOutput = (cmd: string): React.ReactNode => {
+const getCommandOutput = (
+  cmd: string,
+  onViewProjects: () => void
+): React.ReactNode => {
   switch (cmd) {
     case "help":
       return <CommandHelp />;
     case "project":
-      return <Timeline data={PROJECT_DATA} />;
+      return <Button onClick={onViewProjects}>View projects {<Compass />}</Button>;
     case "ls":
       return "Documents  Downloads  Music  Pictures  Public  Templates  Videos";
     case "date":
       return <DateOutput />;
     case "whoami":
-      return <Contact />;
+      return <Whoami />;
     case "skill":
       return <Skills />;
+    case "git":
+      return <GitHubActivity />;
     default:
       return `${cmd} : command not found`;
   }
@@ -288,11 +321,20 @@ const Terminal: React.FC = () => {
   const [history, setHistory] = useState<TerminalLine[]>(INITIAL_HISTORY);
   const [currentInput, setCurrentInput] = useState("");
   const [cwd, setCwd] = useState("~");
-  const [loading, setLoading] = useState(false);
+  const [showProjects, setShowProjects] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const terminalWrapperRef = useRef<HTMLDivElement>(null);
   const { bottomRef, containerRef } = useAutoScroll([history]);
+
+  const handleViewProjects = () => {
+    setShowProjects(true);
+  };
+
+  const handleBackToTerminal = () => {
+    setHistory(INITIAL_HISTORY);
+    setShowProjects(false);
+  };
 
   const handleCommand = (cmd: string) => {
     if (!cmd.trim()) return;
@@ -307,17 +349,18 @@ const Terminal: React.FC = () => {
     const newHistory: TerminalLine[] = [
       ...history,
       { type: "input", content: lowerCaseCommand, cwd },
-      { type: "output", content: getCommandOutput(lowerCaseCommand) },
+      {
+        type: "output",
+        content: getCommandOutput(lowerCaseCommand, handleViewProjects),
+      },
     ];
 
     setHistory(newHistory);
     setCurrentInput("");
 
-    // On mobile, blur input to hide keyboard after command execution
     if (window.innerWidth < 768 && inputRef.current) {
       inputRef.current.blur();
 
-      // Re-center terminal after keyboard hides
       setTimeout(() => {
         if (terminalWrapperRef.current) {
           terminalWrapperRef.current.scrollIntoView({
@@ -325,7 +368,7 @@ const Terminal: React.FC = () => {
             block: "center",
           });
         }
-      }, 300); // Wait for keyboard animation
+      }, 300);
     }
   };
 
@@ -337,61 +380,65 @@ const Terminal: React.FC = () => {
 
   const focusInput = () => inputRef.current?.focus();
 
-  if (loading) return null;
-
   return (
-    <div className="w-full max-w-4xl" ref={terminalWrapperRef}>
-      <motion.div
-        className="mx-auto my-8 rounded-sm overflow-hidden font-mono text-sm bg-[#2C2C2C]  border-[#1A1A1A] shadow-[2px_2px_0px_#000000]"
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{
-          duration: 0.9,
-          ease: [0.22, 1, 0.36, 1],
-          staggerChildren: 0.08,
-          delayChildren: 0.2,
-        }}>
-        <TitleBar />
+    <div className="w-full max-w-4xl mx-auto px-4" ref={terminalWrapperRef}>
+      <AnimatePresence mode="wait">
+        {!showProjects ? (
+          <motion.div
+            key="terminal"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -40 }}
+            transition={{
+              duration: 0.5,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            className="mx-auto my-8 rounded-sm overflow-hidden font-mono text-sm bg-[#2C2C2C] border-[#1A1A1A] shadow-[2px_2px_0px_#000000]">
+            <TitleBar />
 
-        <div
-          ref={containerRef}
-          className="bg-[#300a24] text-white p-2 h-130  md:h-150 overflow-y-auto cursor-text scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar scrollbar-thumb-white scrollbar-track-slate-300"
-          onClick={focusInput}>
-          <div className="flex flex-col space-y-1">
-            {history.map((line, index) => (
-              <div key={index} className="break-words">
-                {line.type === "input" ? (
-                  <div>
-                    <TerminalPrompt cwd={line.cwd || cwd} />
-                    <span className="text-yellow-300">{line.content}</span>
+            <div
+              ref={containerRef}
+              className="bg-[#300a24] text-white p-2 h-130 md:h-150 overflow-y-auto cursor-text scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar scrollbar-thumb-white scrollbar-track-slate-300"
+              onClick={focusInput}>
+              <div className="flex flex-col space-y-1">
+                {history.map((line, index) => (
+                  <div key={index} className="break-words">
+                    {line.type === "input" ? (
+                      <div>
+                        <TerminalPrompt cwd={line.cwd || cwd} />
+                        <span className="text-yellow-300">{line.content}</span>
+                      </div>
+                    ) : typeof line.content === "string" ? (
+                      <div className="whitespace-pre-wrap">{line.content}</div>
+                    ) : (
+                      <>{line.content}</>
+                    )}
                   </div>
-                ) : typeof line.content === "string" ? (
-                  <div className="whitespace-pre-wrap">{line.content}</div>
-                ) : (
-                  <>{line.content}</>
-                )}
+                ))}
               </div>
-            ))}
-          </div>
 
-          <div className="flex items-center mt-1">
-            <TerminalPrompt cwd={cwd} />
-            <input
-              ref={inputRef}
-              type="text"
-              value={currentInput}
-              onChange={(e) => setCurrentInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="flex-1 bg-transparent border-none outline-none focus:ring-0 p-0 text-base font-ubuntu text-yellow-300"
-              autoComplete="off"
-              spellCheck="false"
-              inputMode="text"
-              enterKeyHint="send"
-            />
-          </div>
-          <div ref={bottomRef} />
-        </div>
-      </motion.div>
+              <div className="flex items-center mt-1">
+                <TerminalPrompt cwd={cwd} />
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={currentInput}
+                  onChange={(e) => setCurrentInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="flex-1 bg-transparent border-none outline-none focus:ring-0 p-0 text-base font-ubuntu text-yellow-300"
+                  autoComplete="off"
+                  spellCheck="false"
+                  inputMode="text"
+                  enterKeyHint="send"
+                />
+              </div>
+              <div ref={bottomRef} />
+            </div>
+          </motion.div>
+        ) : (
+          <ProjectsView key="projects" onBack={handleBackToTerminal} />
+        )}
+      </AnimatePresence>
     </div>
   );
 };
