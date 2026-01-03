@@ -3,7 +3,14 @@
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import React, { useState, useRef, useEffect } from "react";
-import { Minus, Square, SquareTerminal, X, ArrowLeft, Compass } from "lucide-react";
+import {
+  Minus,
+  Square,
+  SquareTerminal,
+  X,
+  ArrowLeft,
+  Compass,
+} from "lucide-react";
 import { Button } from "../ui/button";
 import Skills from "./skills";
 import { Whoami } from "./whoami";
@@ -74,8 +81,8 @@ const PROJECT_DATA = [
       <div>
         <p className="mb-8 text-xs font-normal text-neutral-200 md:text-sm">
           untold is like NGL with better features. You can create a book and
-          share it with your friends, join other people's books, and engage with
-          anonymous messages in a safe and fun environment.
+          share it with your friends, join other people&apos;s books, and engage
+          with anonymous messages in a safe and fun environment.
         </p>
         <a
           href="https://untold-tan.vercel.app"
@@ -188,8 +195,9 @@ const CommandHelp: React.FC = () => (
         <React.Fragment key={cmd}>
           <span className="font-semibold text-yellow-300">{cmd}</span>
           <span
-            className={`col-span-2 ${isImportant ? "text-[#8ae234]" : "text-[#d3d7cf]"
-              }`}>
+            className={`col-span-2 ${
+              isImportant ? "text-[#8ae234]" : "text-[#d3d7cf]"
+            }`}>
             {desc}
           </span>
         </React.Fragment>
@@ -271,8 +279,7 @@ const ProjectsView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   );
 };
 
-// ==================== Hooks ====================
-const useAutoScroll = (dependency: any[]) => {
+const useAutoScroll = (dependency: unknown[]) => {
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -286,6 +293,7 @@ const useAutoScroll = (dependency: any[]) => {
       });
     }
     // Mobile: Don't auto-scroll, let keyboard handle the scroll naturally
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, dependency);
 
   return { bottomRef, containerRef };
@@ -300,7 +308,9 @@ const getCommandOutput = (
     case "help":
       return <CommandHelp />;
     case "project":
-      return <Button onClick={onViewProjects}>View projects {<Compass />}</Button>;
+      return (
+        <Button onClick={onViewProjects}>View projects {<Compass />}</Button>
+      );
     case "ls":
       return "Documents  Downloads  Music  Pictures  Public  Templates  Videos";
     case "date":
@@ -333,6 +343,7 @@ const Terminal: React.FC = () => {
 
   const handleBackToTerminal = () => {
     setHistory(INITIAL_HISTORY);
+    setCwd("~");
     setShowProjects(false);
   };
 
