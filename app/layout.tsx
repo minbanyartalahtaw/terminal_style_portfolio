@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Ubuntu } from "next/font/google";
 import "./globals.css";
@@ -22,6 +23,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`font-ubuntu antialiased ${ubuntu.variable}`}>
         {children}
+        <Analytics />
       </body>
     </html>
   );
