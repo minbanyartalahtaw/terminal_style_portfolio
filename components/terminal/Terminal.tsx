@@ -1,9 +1,16 @@
 "use client";
 
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import React, { useState, useRef, useEffect } from "react";
-import { Minus, Square, SquareTerminal, X, ArrowLeft, Compass } from "lucide-react";
+import {
+  Minus,
+  Square,
+  SquareTerminal,
+  X,
+  ArrowLeft,
+  Compass,
+} from "lucide-react";
 import { Button } from "../ui/button";
 import Skills from "./skills";
 import { Whoami } from "./whoami";
@@ -43,16 +50,47 @@ const INITIAL_HISTORY: TerminalLine[] = [
 // ==================== Data for TimeLine Compo  ====================
 const PROJECT_DATA = [
   {
+    title: "Music Player in your terminal.",
+    content: (
+      <div>
+        <p className="mb-8 text-xs font-normal text-neutral-200 md:text-sm">
+          A terminal-based music player built in Rust. Stream your favorite
+          tracks with a clean, intuitive interface and built-in equalizer. Also
+          this project is my first project using with vibe coding.
+        </p>
+        <a
+          href="https://github.com/minbanyartalahtaw/tui_music_player"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block px-6 py-2 mb-8 text-sm font-medium text-black bg-white rounded-lg">
+          Repo Link
+        </a>
+        <div className="grid grid-cols-2 gap-4">
+          {[1, 2].map((num) => (
+            <Image
+              key={num}
+              src={`/project/tui_music_player/music_player_${num}.png`}
+              alt={`Discover Myanmar screenshot ${num}`}
+              width={500}
+              height={500}
+              className="h-32 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-60 lg:h-80 xl:h-96"
+            />
+          ))}
+        </div>
+      </div>
+    ),
+  },
+  {
     title: "Discover Myanmar",
     content: (
       <div>
-        <a
+        {/*         <a
           href="https://discover-myanmar.vercel.app/user/"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-block px-6 py-2 mb-8 text-sm font-medium text-black bg-white rounded-lg">
           Visit Website
-        </a>
+        </a> */}
         <div className="grid grid-cols-2 gap-4">
           {[1, 2, 3, 4].map((num) => (
             <Image
@@ -61,7 +99,7 @@ const PROJECT_DATA = [
               alt={`Discover Myanmar screenshot ${num}`}
               width={500}
               height={500}
-              className="h-20 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-44 lg:h-60"
+              className="h-32 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-60 lg:h-80 xl:h-96"
             />
           ))}
         </div>
@@ -74,16 +112,16 @@ const PROJECT_DATA = [
       <div>
         <p className="mb-8 text-xs font-normal text-neutral-200 md:text-sm">
           untold is like NGL with better features. You can create a book and
-          share it with your friends, join other people's books, and engage with
-          anonymous messages in a safe and fun environment.
+          share it with your friends, join other people&apos;s books, and engage
+          with anonymous messages in a safe and fun environment.
         </p>
-        <a
+        {/* <a
           href="https://untold-tan.vercel.app"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-block px-6 py-2 mb-8 text-sm font-medium text-black bg-white rounded-lg">
           Visit Website
-        </a>
+        </a> */}
         <div className="grid grid-cols-2 gap-4">
           {[1, 2, 3].map((num) => (
             <Image
@@ -92,7 +130,7 @@ const PROJECT_DATA = [
               alt={`untold screenshot ${num}`}
               width={500}
               height={500}
-              className="h-20 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-44 lg:h-60"
+              className="h-32 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-60 lg:h-80 xl:h-96"
             />
           ))}
         </div>
@@ -111,7 +149,7 @@ const PROJECT_DATA = [
               alt={`ch2k screenshot ${num}`}
               width={500}
               height={500}
-              className="h-20 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-44 lg:h-60"
+              className="h-32 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-60 lg:h-80 xl:h-96"
             />
           ))}
         </div>
@@ -137,7 +175,7 @@ const PROJECT_DATA = [
               alt={`AU-Helper screenshot ${num}`}
               width={500}
               height={500}
-              className="h-20 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-44 lg:h-60"
+              className="h-32 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-60 lg:h-80 xl:h-96"
             />
           ))}
         </div>
@@ -163,7 +201,7 @@ const PROJECT_DATA = [
               alt={`Snake and Ladder screenshot ${num}`}
               width={500}
               height={500}
-              className="h-20 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-44 lg:h-60"
+              className="h-32 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-60 lg:h-80 xl:h-96"
             />
           ))}
         </div>
@@ -188,8 +226,9 @@ const CommandHelp: React.FC = () => (
         <React.Fragment key={cmd}>
           <span className="font-semibold text-yellow-300">{cmd}</span>
           <span
-            className={`col-span-2 ${isImportant ? "text-[#8ae234]" : "text-[#d3d7cf]"
-              }`}>
+            className={`col-span-2 ${
+              isImportant ? "text-[#8ae234]" : "text-[#d3d7cf]"
+            }`}>
             {desc}
           </span>
         </React.Fragment>
@@ -224,7 +263,7 @@ const DateOutput: React.FC = () => {
 const TitleBar: React.FC<{ title?: string }> = ({
   title = "banyar@ubuntu",
 }) => (
-  <div className="bg-[#2D2D2D] h-10 flex items-center justify-between px-3 select-none border-b border-black/50">
+  <div className="bg-[rgba(38,52,64,0.62)] h-10 flex items-center justify-between px-3 select-none border-b border-white/15">
     <Button className="w-8 h-8 flex items-center justify-center rounded hover:bg-white/10 transition-colors group">
       <SquareTerminal />
     </Button>
@@ -255,10 +294,10 @@ const ProjectsView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      className="mx-auto my-8 rounded-sm overflow-hidden font-mono text-sm  w-full max-w-4xl">
-      <div className="text-white p-2 scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar scrollbar-thumb-white scrollbar-track-slate-300">
+      className="w-full min-h-screen rounded-none overflow-hidden font-mono text-sm liquid-glass-panel">
+      <div className="text-white h-screen overflow-y-auto p-6 md:p-10 liquid-glass-inner scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar scrollbar-thumb-white/60 scrollbar-track-slate-300/30">
         <Timeline data={PROJECT_DATA} />
-        <div className="mb-6">
+        <div className="mt-8 mb-10">
           <Button onClick={onBack}>
             <div className="flex items-center gap-2">
               <ArrowLeft size={16} />
@@ -272,21 +311,15 @@ const ProjectsView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 };
 
 // ==================== Hooks ====================
-const useAutoScroll = (dependency: any[]) => {
+const useAutoScroll = (dependency: number) => {
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const isMobile = window.innerWidth < 768;
-
-    if (!isMobile) {
-      // Desktop: smooth scroll to bottom
-      requestAnimationFrame(() => {
-        bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-      });
-    }
-    // Mobile: Don't auto-scroll, let keyboard handle the scroll naturally
-  }, dependency);
+    requestAnimationFrame(() => {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    });
+  }, [dependency]);
 
   return { bottomRef, containerRef };
 };
@@ -294,13 +327,15 @@ const useAutoScroll = (dependency: any[]) => {
 // ==================== Command Handler ====================
 const getCommandOutput = (
   cmd: string,
-  onViewProjects: () => void
+  onViewProjects: () => void,
 ): React.ReactNode => {
   switch (cmd) {
     case "help":
       return <CommandHelp />;
     case "project":
-      return <Button onClick={onViewProjects}>View projects {<Compass />}</Button>;
+      return (
+        <Button onClick={onViewProjects}>View projects {<Compass />}</Button>
+      );
     case "ls":
       return "Documents  Downloads  Music  Pictures  Public  Templates  Videos";
     case "date":
@@ -320,12 +355,12 @@ const getCommandOutput = (
 const Terminal: React.FC = () => {
   const [history, setHistory] = useState<TerminalLine[]>(INITIAL_HISTORY);
   const [currentInput, setCurrentInput] = useState("");
-  const [cwd, setCwd] = useState("~");
+  const cwd = "~";
   const [showProjects, setShowProjects] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const terminalWrapperRef = useRef<HTMLDivElement>(null);
-  const { bottomRef, containerRef } = useAutoScroll([history]);
+  const { bottomRef, containerRef } = useAutoScroll(history.length);
 
   const handleViewProjects = () => {
     setShowProjects(true);
@@ -381,7 +416,11 @@ const Terminal: React.FC = () => {
   const focusInput = () => inputRef.current?.focus();
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4" ref={terminalWrapperRef}>
+    <div
+      className={`relative z-10 w-full ${
+        showProjects ? "max-w-none mx-0 px-0" : "max-w-4xl mx-auto px-5 md:px-6"
+      }`}
+      ref={terminalWrapperRef}>
       <AnimatePresence mode="wait">
         {!showProjects ? (
           <motion.div
@@ -393,14 +432,14 @@ const Terminal: React.FC = () => {
               duration: 0.5,
               ease: [0.22, 1, 0.36, 1],
             }}
-            className="mx-auto my-8 rounded-sm overflow-hidden font-mono text-sm bg-[#2C2C2C] border-[#1A1A1A] shadow-[2px_2px_0px_#000000]">
+            className="mx-auto my-10 rounded-xl overflow-hidden font-mono text-sm liquid-glass-panel">
             <TitleBar />
 
             <div
               ref={containerRef}
-              className="bg-[#300a24] text-white p-2 h-130 md:h-150 overflow-y-auto cursor-text scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar scrollbar-thumb-white scrollbar-track-slate-300"
+              className="liquid-glass-inner text-white p-4 md:p-6 h-130 md:h-150 overflow-y-auto cursor-text leading-relaxed scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar scrollbar-thumb-white/60 scrollbar-track-slate-300/30"
               onClick={focusInput}>
-              <div className="flex flex-col space-y-1">
+              <div className="flex flex-col space-y-2">
                 {history.map((line, index) => (
                   <div key={index} className="break-words">
                     {line.type === "input" ? (

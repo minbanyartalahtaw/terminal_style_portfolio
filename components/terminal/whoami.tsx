@@ -28,7 +28,7 @@ const contactData: ContactInfo = {
   email: "minbanyartalahtaw@proton.me",
   fullName: "Min Banyar Tala Htaw",
   city: "Bangkok, Thailand",
-  age: 20,
+  age: 21,
   socialProfiles: [
     {
       name: "GitHub",
