@@ -11,9 +11,167 @@ type WordSprite = {
   baseY: number;
   bobAmplitude: number;
   bobSpeed: number;
+  anchorX: number;
+  anchorZ: number;
 };
 
-const createWordTexture = (word: string): THREE.CanvasTexture => {
+type MatrixTheme =
+  | "green"
+  | "blue"
+  | "pink"
+  | "cyan"
+  | "purple"
+  | "amber"
+  | "red"
+  | "teal"
+  | "lime"
+  | "mono";
+
+const THEME_COLORS: Record<
+  MatrixTheme,
+  {
+    textStart: string;
+    textEnd: string;
+    shadow: string;
+    ambient: string;
+    directional: string;
+    gridMajor: string;
+    gridMinor: string;
+    backGridMajor: string;
+    backGridMinor: string;
+    wave: string;
+  }
+> = {
+  green: {
+    textStart: "rgba(170,255,200,0.95)",
+    textEnd: "rgba(122,244,255,0.95)",
+    shadow: "rgba(117, 255, 209, 0.72)",
+    ambient: "#9cfec8",
+    directional: "#57d1ff",
+    gridMajor: "#4af1a2",
+    gridMinor: "#1e4c53",
+    backGridMajor: "#3ad2ff",
+    backGridMinor: "#1c3e4f",
+    wave: "#67ffca",
+  },
+  blue: {
+    textStart: "rgba(176,217,255,0.95)",
+    textEnd: "rgba(117,170,255,0.95)",
+    shadow: "rgba(100, 176, 255, 0.75)",
+    ambient: "#96c8ff",
+    directional: "#4f9bff",
+    gridMajor: "#71bcff",
+    gridMinor: "#1b3a63",
+    backGridMajor: "#9dd9ff",
+    backGridMinor: "#17334d",
+    wave: "#7dc6ff",
+  },
+  pink: {
+    textStart: "rgba(255,182,230,0.95)",
+    textEnd: "rgba(255,109,185,0.95)",
+    shadow: "rgba(255, 106, 180, 0.75)",
+    ambient: "#ffb2e9",
+    directional: "#ff6bbd",
+    gridMajor: "#ff7fc8",
+    gridMinor: "#53224a",
+    backGridMajor: "#ff9fdd",
+    backGridMinor: "#44203c",
+    wave: "#ff8fd2",
+  },
+  cyan: {
+    textStart: "rgba(174,255,255,0.95)",
+    textEnd: "rgba(103,220,235,0.95)",
+    shadow: "rgba(95, 234, 255, 0.74)",
+    ambient: "#a8fcff",
+    directional: "#58d7f5",
+    gridMajor: "#67e7ea",
+    gridMinor: "#1e4a50",
+    backGridMajor: "#8ceff2",
+    backGridMinor: "#173c41",
+    wave: "#6fe4e8",
+  },
+  purple: {
+    textStart: "rgba(211,188,255,0.95)",
+    textEnd: "rgba(156,126,255,0.95)",
+    shadow: "rgba(172, 120, 255, 0.76)",
+    ambient: "#cfb1ff",
+    directional: "#9b75ff",
+    gridMajor: "#b190ff",
+    gridMinor: "#32214f",
+    backGridMajor: "#c4a8ff",
+    backGridMinor: "#281b40",
+    wave: "#b497ff",
+  },
+  amber: {
+    textStart: "rgba(255,227,165,0.95)",
+    textEnd: "rgba(255,178,93,0.95)",
+    shadow: "rgba(255, 186, 95, 0.78)",
+    ambient: "#ffd99a",
+    directional: "#ffb95e",
+    gridMajor: "#ffc872",
+    gridMinor: "#4d3821",
+    backGridMajor: "#ffd694",
+    backGridMinor: "#3f2e1a",
+    wave: "#ffcc7d",
+  },
+  red: {
+    textStart: "rgba(255,194,194,0.95)",
+    textEnd: "rgba(255,120,120,0.95)",
+    shadow: "rgba(255, 113, 113, 0.76)",
+    ambient: "#ffc0c0",
+    directional: "#ff7171",
+    gridMajor: "#ff8d8d",
+    gridMinor: "#4f2222",
+    backGridMajor: "#ffaaaa",
+    backGridMinor: "#401c1c",
+    wave: "#ff9595",
+  },
+  teal: {
+    textStart: "rgba(180,255,234,0.95)",
+    textEnd: "rgba(96,218,194,0.95)",
+    shadow: "rgba(96, 230, 202, 0.76)",
+    ambient: "#a7ffe7",
+    directional: "#59d7bf",
+    gridMajor: "#73e7d0",
+    gridMinor: "#1f4a43",
+    backGridMajor: "#90f0dc",
+    backGridMinor: "#183d37",
+    wave: "#7fe8d5",
+  },
+  lime: {
+    textStart: "rgba(223,255,170,0.95)",
+    textEnd: "rgba(164,226,101,0.95)",
+    shadow: "rgba(174, 244, 100, 0.77)",
+    ambient: "#d6ff9e",
+    directional: "#a8df59",
+    gridMajor: "#bff170",
+    gridMinor: "#344b1f",
+    backGridMajor: "#d0f691",
+    backGridMinor: "#293c18",
+    wave: "#c2ef79",
+  },
+  mono: {
+    textStart: "rgba(235,239,245,0.95)",
+    textEnd: "rgba(170,181,194,0.95)",
+    shadow: "rgba(196, 208, 223, 0.72)",
+    ambient: "#d4dde8",
+    directional: "#9aa9ba",
+    gridMajor: "#bcc7d3",
+    gridMinor: "#39424d",
+    backGridMajor: "#cfd8e2",
+    backGridMinor: "#2f3741",
+    wave: "#c3ccd8",
+  },
+};
+
+const createWordTexture = (
+  word: string,
+  colors: {
+    textStart: string;
+    textEnd: string;
+    shadow: string;
+  },
+): THREE.CanvasTexture => {
   const canvas = document.createElement("canvas");
   const fontSize = 54;
   const safeWord = word.trim() || "Word";
@@ -24,8 +182,8 @@ const createWordTexture = (word: string): THREE.CanvasTexture => {
   const ctx = canvas.getContext("2d");
   if (ctx) {
     const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-    gradient.addColorStop(0, "rgba(170,255,200,0.95)");
-    gradient.addColorStop(1, "rgba(122,244,255,0.95)");
+    gradient.addColorStop(0, colors.textStart);
+    gradient.addColorStop(1, colors.textEnd);
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "rgba(0, 0, 0, 0.16)";
@@ -35,7 +193,7 @@ const createWordTexture = (word: string): THREE.CanvasTexture => {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
-    ctx.shadowColor = "rgba(117, 255, 209, 0.72)";
+    ctx.shadowColor = colors.shadow;
     ctx.shadowBlur = 18;
     ctx.fillStyle = gradient;
     ctx.fillText(safeWord, canvas.width / 2, canvas.height / 2 + 2);
@@ -50,15 +208,27 @@ const createWordTexture = (word: string): THREE.CanvasTexture => {
 
 interface MatrixWaveBackgroundProps {
   words?: string[];
+  centerFocus?: number;
+  theme?: MatrixTheme;
 }
 
-export default function MatrixWaveBackground({ words = [] }: MatrixWaveBackgroundProps) {
+export default function MatrixWaveBackground({
+  words = [],
+  centerFocus = 35,
+  theme = "green",
+}: MatrixWaveBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const focusRef = useRef(centerFocus);
+
+  useEffect(() => {
+    focusRef.current = centerFocus;
+  }, [centerFocus]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    const themeColors = THEME_COLORS[theme];
     const wordList = words.length ? words : ["Apple", "Mango", "dumark", "text"];
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -78,14 +248,14 @@ export default function MatrixWaveBackground({ words = [] }: MatrixWaveBackgroun
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
     renderer.setSize(window.innerWidth, window.innerHeight);
 
-    const ambient = new THREE.AmbientLight("#9cfec8", 0.62);
+    const ambient = new THREE.AmbientLight(themeColors.ambient, 0.62);
     scene.add(ambient);
 
-    const directional = new THREE.DirectionalLight("#57d1ff", 0.95);
+    const directional = new THREE.DirectionalLight(themeColors.directional, 0.95);
     directional.position.set(8, 14, 12);
     scene.add(directional);
 
-    const grid = new THREE.GridHelper(130, 44, "#4af1a2", "#1e4c53");
+    const grid = new THREE.GridHelper(130, 44, themeColors.gridMajor, themeColors.gridMinor);
     const gridMaterial = grid.material as THREE.Material;
     gridMaterial.transparent = true;
     gridMaterial.opacity = 0.55;
@@ -93,7 +263,12 @@ export default function MatrixWaveBackground({ words = [] }: MatrixWaveBackgroun
     grid.position.z = -10;
     scene.add(grid);
 
-    const backGrid = new THREE.GridHelper(110, 30, "#3ad2ff", "#1c3e4f");
+    const backGrid = new THREE.GridHelper(
+      110,
+      30,
+      themeColors.backGridMajor,
+      themeColors.backGridMinor,
+    );
     const backGridMaterial = backGrid.material as THREE.Material;
     backGridMaterial.transparent = true;
     backGridMaterial.opacity = 0.2;
@@ -134,7 +309,14 @@ export default function MatrixWaveBackground({ words = [] }: MatrixWaveBackgroun
       const word = wordList[i % wordList.length];
 
       if (!wordTextures.has(word)) {
-        wordTextures.set(word, createWordTexture(word));
+        wordTextures.set(
+          word,
+          createWordTexture(word, {
+            textStart: themeColors.textStart,
+            textEnd: themeColors.textEnd,
+            shadow: themeColors.shadow,
+          }),
+        );
       }
 
       const material = new THREE.SpriteMaterial({
@@ -165,6 +347,8 @@ export default function MatrixWaveBackground({ words = [] }: MatrixWaveBackgroun
         baseY,
         bobAmplitude,
         bobSpeed,
+        anchorX: x,
+        anchorZ: z,
       });
 
       wordGroup.add(sprite);
@@ -196,7 +380,7 @@ export default function MatrixWaveBackground({ words = [] }: MatrixWaveBackgroun
     waveGeometry.setAttribute("position", new THREE.BufferAttribute(wavePositions, 3));
 
     const waveMaterial = new THREE.PointsMaterial({
-      color: "#67ffca",
+      color: themeColors.wave,
       size: 0.08,
       transparent: true,
       opacity: 0.44,
@@ -249,6 +433,10 @@ export default function MatrixWaveBackground({ words = [] }: MatrixWaveBackgroun
       }
       positionAttr.needsUpdate = true;
 
+      const normalizedFocus = THREE.MathUtils.clamp(focusRef.current / 100, 0, 1);
+      const spread = THREE.MathUtils.lerp(1, 0.15, normalizedFocus);
+      const zSpread = THREE.MathUtils.lerp(1, 0.25, normalizedFocus);
+
       for (const wordSprite of wordSprites) {
         wordSprite.sprite.position.y =
           wordSprite.baseY +
@@ -259,12 +447,14 @@ export default function MatrixWaveBackground({ words = [] }: MatrixWaveBackgroun
           wordSprite.baseY = -12.2;
         }
 
-        wordSprite.sprite.position.x +=
-          Math.sin(elapsed * 0.7 + wordSprite.phase) * wordSprite.drift;
+        wordSprite.sprite.position.x =
+          wordSprite.anchorX * spread +
+          Math.sin(elapsed * 0.7 + wordSprite.phase) * wordSprite.drift * (0.6 + spread);
 
-        if (wordSprite.sprite.position.x > 62) {
-          wordSprite.sprite.position.x = -62;
-        }
+        wordSprite.sprite.position.z =
+          -8 +
+          (wordSprite.anchorZ - -8) * zSpread +
+          Math.cos(elapsed * 0.55 + wordSprite.phase) * 0.03;
       }
 
       targetCamera.x = pointer.x * 4.8;
@@ -318,7 +508,7 @@ export default function MatrixWaveBackground({ words = [] }: MatrixWaveBackgroun
       renderer.dispose();
       scene.clear();
     };
-  }, [words]);
+  }, [words, theme]);
 
   return (
     <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
