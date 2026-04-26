@@ -206,6 +206,8 @@ const createWordTexture = (
   return texture;
 };
 
+const clamp01 = (value: number) => THREE.MathUtils.clamp(value, 0, 1);
+
 interface MatrixWaveBackgroundProps {
   words?: string[];
   centerFocus?: number;
@@ -356,6 +358,23 @@ export default function MatrixWaveBackground({
 
     scene.add(wordGroup);
 
+    const centerTexture = createWordTexture("Web Developer", {
+      textStart: themeColors.textStart,
+      textEnd: themeColors.textEnd,
+      shadow: themeColors.shadow,
+    });
+    const centerMaterial = new THREE.SpriteMaterial({
+      map: centerTexture,
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    const centerNode = new THREE.Sprite(centerMaterial);
+    centerNode.position.set(0, -2.7, -8);
+    centerNode.scale.set(8.8, 2.2, 1);
+    scene.add(centerNode);
+
     const waveWidth = 96;
     const waveDepth = 76;
     const waveSegmentsX = 88;
@@ -433,9 +452,16 @@ export default function MatrixWaveBackground({
       }
       positionAttr.needsUpdate = true;
 
-      const normalizedFocus = THREE.MathUtils.clamp(focusRef.current / 100, 0, 1);
-      const spread = THREE.MathUtils.lerp(1, 0.15, normalizedFocus);
-      const zSpread = THREE.MathUtils.lerp(1, 0.25, normalizedFocus);
+      const zoomLevel = 1 - clamp01(focusRef.current / 100);
+      const spread = THREE.MathUtils.lerp(1, 0.15, zoomLevel);
+      const zSpread = THREE.MathUtils.lerp(1, 0.25, zoomLevel);
+      const spreadLevel = 1 - zoomLevel;
+      const centerReveal = clamp01((spreadLevel - 0.54) / 0.34);
+
+      centerMaterial.opacity = centerReveal * 0.95;
+
+      const centerScale = 8.2 + centerReveal * 1.2;
+      centerNode.scale.set(centerScale, 2.0 + centerReveal * 0.45, 1);
 
       for (const wordSprite of wordSprites) {
         wordSprite.sprite.position.y =
@@ -500,6 +526,8 @@ export default function MatrixWaveBackground({
       }
 
       wordTextures.forEach((texture) => texture.dispose());
+      centerTexture.dispose();
+      centerMaterial.dispose();
 
       gridMaterial.dispose();
       backGridMaterial.dispose();
