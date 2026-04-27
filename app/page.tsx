@@ -218,14 +218,14 @@ export default function Home() {
       )}
 
       {terminalWindowState !== "open" && showThemePicker && (
-        <div className="fixed bottom-20 left-1/2 z-40 -translate-x-1/2 rounded-xl border border-white/20 bg-[rgba(8,18,28,0.82)] p-2 backdrop-blur-md">
-          <div className="grid grid-cols-5 gap-2">
+        <div className="fixed inset-x-3 bottom-20 z-40 rounded-xl border border-white/20 bg-[rgba(8,18,28,0.82)] p-2 backdrop-blur-md sm:inset-x-auto sm:left-1/2 sm:w-[min(92vw,520px)] sm:-translate-x-1/2">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {THEME_OPTIONS.map((option) => (
               <button
                 key={option.value}
                 type="button"
                 onClick={() => setMatrixTheme(option.value)}
-                className={`h-9 rounded-md px-3 text-sm text-white transition-colors border ${
+                className={`h-9 min-w-0 rounded-md px-2 text-xs text-white transition-colors border sm:px-3 sm:text-sm ${
                   matrixTheme === option.value
                     ? option.activeClass
                     : "bg-[rgba(18,30,42,0.8)] border-white/10"
