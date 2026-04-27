@@ -375,6 +375,25 @@ export default function MatrixWaveBackground({
     centerNode.scale.set(8.8, 2.2, 1);
     scene.add(centerNode);
 
+    const connectedNodeCount = Math.min(28, wordSprites.length);
+    const connectionIndices = Array.from({ length: connectedNodeCount }, (_, i) =>
+      Math.floor((i * wordSprites.length) / connectedNodeCount),
+    );
+    const connectionPositions = new Float32Array(connectedNodeCount * 2 * 3);
+    const connectionGeometry = new THREE.BufferGeometry();
+    connectionGeometry.setAttribute("position", new THREE.BufferAttribute(connectionPositions, 3));
+
+    const connectionMaterial = new THREE.LineBasicMaterial({
+      color: themeColors.wave,
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+
+    const connections = new THREE.LineSegments(connectionGeometry, connectionMaterial);
+    scene.add(connections);
+
     const waveWidth = 96;
     const waveDepth = 76;
     const waveSegmentsX = 88;
@@ -457,8 +476,10 @@ export default function MatrixWaveBackground({
       const zSpread = THREE.MathUtils.lerp(1, 0.25, zoomLevel);
       const spreadLevel = 1 - zoomLevel;
       const centerReveal = clamp01((spreadLevel - 0.54) / 0.34);
+      const showConnections = focusRef.current >=  90 && focusRef.current <= 100;
 
       centerMaterial.opacity = centerReveal * 0.95;
+      connectionMaterial.opacity = showConnections ? 0.45 : 0;
 
       const centerScale = 8.2 + centerReveal * 1.2;
       centerNode.scale.set(centerScale, 2.0 + centerReveal * 0.45, 1);
@@ -482,6 +503,21 @@ export default function MatrixWaveBackground({
           (wordSprite.anchorZ - -8) * zSpread +
           Math.cos(elapsed * 0.55 + wordSprite.phase) * 0.03;
       }
+
+      const lineAttr = connectionGeometry.getAttribute("position") as THREE.BufferAttribute;
+      for (let i = 0; i < connectionIndices.length; i++) {
+        const node = wordSprites[connectionIndices[i]];
+        const base = i * 6;
+
+        lineAttr.array[base] = centerNode.position.x;
+        lineAttr.array[base + 1] = centerNode.position.y;
+        lineAttr.array[base + 2] = centerNode.position.z;
+
+        lineAttr.array[base + 3] = node.sprite.position.x;
+        lineAttr.array[base + 4] = node.sprite.position.y;
+        lineAttr.array[base + 5] = node.sprite.position.z;
+      }
+      lineAttr.needsUpdate = true;
 
       targetCamera.x = pointer.x * 4.8;
       targetCamera.y = 7 - pointer.y * 2.9;
@@ -533,6 +569,8 @@ export default function MatrixWaveBackground({
       backGridMaterial.dispose();
       waveGeometry.dispose();
       waveMaterial.dispose();
+      connectionGeometry.dispose();
+      connectionMaterial.dispose();
       renderer.dispose();
       scene.clear();
     };
