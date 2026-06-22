@@ -55,7 +55,7 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
 
   return (
     <>
-      <div className="w-full min-h-screen bg-[rgba(6,10,15,0.56)] rounded-lg border border-white/10 z-40">
+      <div className="w-full min-h-screen bg-[rgba(6,10,15,0.56)] rounded-lg border border-white/10 z-40 scr overflow-x-hidden">
         <div className="px-6 py-8 md:px-12 md:py-12 border-b border-white/10">
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: "easeOut" }}>
             <h2 className="text-2xl md:text-3xl mb-3 text-white font-semibold tracking-tight">
